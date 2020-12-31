@@ -6,7 +6,7 @@ import ListenButton from './components/ListenButton';
 function App() {
   return (
     <div className="App">
-      <header className = "Banner">
+      <div className = "Page">
         <div className = "Background">
           <div className = "Podcast-Art">
             <img src = {podcast_art} />
@@ -24,9 +24,9 @@ function App() {
             <ListenButton iconClasses="Apple-Podcast-Icon fa fa-podcast" textClasses = "Listen" text = "Listen on Apple Podcast" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>
           </div>
         </div>
-      </header>
-      
-      <EpisodePlayer />
+
+        <div className = "EpisodePlayerContainer"><EpisodePlayer /></div>
+      </div>
     </div>
   );
 }
