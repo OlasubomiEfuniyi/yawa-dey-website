@@ -20,13 +20,12 @@ function App() {
           Yawa Dey will spotlight topics that have come up in various conversations I have had with people in recent times. 
           We will get different takes on these topics and have a laugh or two in the process (hopefully!).</p>
           <div className = "Listen-Buttons">
-            <ListenButton iconClasses="Spotify-Icon fa fa-spotify" textClasses = "Listen" text = "Listen on Spotify"/>
-            <ListenButton iconClasses="Apple-Podcast-Icon fa fa-podcast" textClasses = "Listen" text = "Listen on Apple Podcast" />
+            <ListenButton iconClasses="Spotify-Icon fa fa-spotify" textClasses = "Listen" text = "Listen on Spotify" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>
+            <ListenButton iconClasses="Apple-Podcast-Icon fa fa-podcast" textClasses = "Listen" text = "Listen on Apple Podcast" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>
           </div>
         </div>
-
-
       </header>
+      
       <EpisodePlayer />
     </div>
   );
