@@ -1,6 +1,28 @@
 import React from 'react';
 
+
 class EpisodePlayer extends React.Component {
+
+    async getEpisodes() {
+        const response = await fetch("http://localhost:8080/episodes", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                seasonNumber: 1
+            })
+        });
+
+        const result = await response.json();
+        return result;
+    }
+
+    componentDidMount() {
+        const episodes = this.getEpisodes();
+        console.log(episodes);
+    }
+
     render() {
         return (
             <table className = "EpisodePlayerTable">
