@@ -100,7 +100,7 @@
 .EpisodePlayerContainer {
   padding-right: 200px;
   margin-top: 50px;
-  width: 50%;
+  width: 70%;
 }
 
 .EpisodePlayerTable {
@@ -146,8 +146,8 @@
 }
 
 .EpisodeTitle {
-  font-family: 'Bungee Outline', sans-serif;
-  font-size: 30px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 20px;
   margin: 0;
 }
 
@@ -156,4 +156,10 @@
   font-family: 'Open Sans', sans-serif;
   font-size: 15px;
   margin: 0;
+}
+
+.FooterText {
+  font-size: 30px;
+  font-weight: normal;
+  font-family: 'Open Sans', sans-serif;
 }

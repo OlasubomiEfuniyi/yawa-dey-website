@@ -21,11 +21,13 @@ function App() {
           We will get different takes on these topics and have a laugh or two in the process (hopefully!).</p>
           <div className = "Listen-Buttons">
             <ListenButton iconClasses="Spotify-Icon fa fa-spotify" textClasses = "Listen" text = "Listen on Spotify" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>
-            <ListenButton iconClasses="Apple-Podcast-Icon fa fa-podcast" textClasses = "Listen" text = "Listen on Apple Podcast" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>
+            {/*<ListenButton iconClasses="Apple-Podcast-Icon fa fa-podcast" textClasses = "Listen" text = "Listen on Apple Podcast" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>*/}
           </div>
         </div>
-
         <div className = "EpisodePlayerContainer"><EpisodePlayer /></div>
+
+        <div className = "Footer"><h5 className = "FooterText"><i className="fa fa-copyright" aria-hidden="true"></i>Yawa Dey 2021</h5></div>
+
       </div>
     </div>
   );
