@@ -24,7 +24,7 @@ function App() {
             {/*<ListenButton iconClasses="Apple-Podcast-Icon fa fa-podcast" textClasses = "Listen" text = "Listen on Apple Podcast" linkTo = "https://open.spotify.com/show/79dcEWCwJa1mnoszEUsjBo"/>*/}
           </div>
         </div>
-        <div className = "EpisodePlayerContainer"><EpisodePlayer /></div>
+        <EpisodePlayer />
 
         <div className = "Footer"><h5 className = "FooterText"><i className="fa fa-copyright" aria-hidden="true"></i>Yawa Dey 2021</h5></div>
 
