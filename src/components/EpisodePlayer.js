@@ -1,68 +1,58 @@
 import React from 'react';
+import ScaleLoader from 'react-spinners/ScaleLoader';
+
+const backend = "https://yawa-dey-backend.herokuapp.com/";
 
 class EpisodePlayer extends React.Component {
     constructor(props) {
         super(props);
         //the seasons and series arrays will always have "All" as their first value
-        this.state = {seasonNumber: null, series: null, episodes: [], seasonsList: ["All"], seriesList: ["All"], searchTerm:"", filtered: true};
+        this.state = {seasonNumber: null, series: null, episodes: [], 
+            seasonsList: ["All"], seriesList: ["All"], searchTerm:"", 
+            filtered: true, err:false, errObject: null, loadingTable:false};
     }
 
-    async getEpisodes() {
-        let response = null;
-
-        //If search is being used, ignore filters, otherwise use filters
-        if(this.state.filtered) {
-            response = await fetch("http://localhost:8080/episodes", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    filtered: true,
-                    seasonNumber: this.state.seasonNumber,
-                    series: this.state.series
-                })
+    postRequestWithBody(endpoint, body, successCallback, errCallback) {
+        fetch(`${backend}${endpoint}`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        }).then((response) => { //404 errors from the server still constitute a response
+            response.json().then((result) => {
+                if(response.ok) {
+                    successCallback(result);
+                } else {
+                    errCallback(result);
+                }
+            }, (err) => {
+                errCallback(err);
             });
-        } else {
-            response = await fetch("http://localhost:8080/episodes", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    filtered: false,
-                    searchTerm: this.state.searchTerm
-                })
-            });
-            
-        }
-
-        const result = await response.json();
-        return result;
+        }, (err) => {
+            errCallback(err);
+        });
     }
 
-    async getSeasons() {
-        const response = await fetch("http://localhost:8080/seasons", {
+    getRequestNoBody(endpoint, successCallback, errCallback) {
+        fetch(`${backend}${endpoint}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'
             }
+        }).then((response) => {
+            response.json().then((result) => {
+                if(response.ok) {
+                    successCallback(result);
+                } else {
+                    errCallback(result);
+                }
+            }, (err) => {
+                errCallback(err);
+            });
+        }, (err) => {
+            errCallback(err);
         });
-
-        const result = await response.json();
-        return result;
-    }
-
-    async getSeries() {
-        const response = await fetch("http://localhost:8080/series", {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
-            }   
-        });
-
-        const result = await response.json();
-        return result;
     }
 
     componentDidMount() {
@@ -71,33 +61,38 @@ class EpisodePlayer extends React.Component {
     }
 
     populateFilter() {
-        const seasonsPromise = this.getSeasons();
-        const seriesPromise = this.getSeries();
-
-        seasonsPromise.then((result) => {
+        this.getRequestNoBody("seasons", (result) => {
             console.log(result.seasons);
-            this.setState({seasonsList: this.state.seasonsList.concat(result.seasons)});
-        }, (err) => {
-            console.log(err);
-        });
+            this.setState({err: false, seasonsList: this.state.seasonsList.concat(result.seasons)});
+        }, (err) => this.errorHandler(err));
 
-        seriesPromise.then((result) => {
+        this.getRequestNoBody("series", (result) => {
             console.log(result.series);
-            this.setState({seriesList: this.state.seriesList.concat(result.series)});
-        }, (err) => {
-            console.log(err);
-        });
+            this.setState({err: false, seriesList: this.state.seriesList.concat(result.series)});
+        }, (err) => this.errorHandler(err));
     }
 
     populateTable() {
-        const episodesPromise = this.getEpisodes();
+        let body = {};
 
-        episodesPromise.then((result) => {
+        //If search is being used, ignore filters, otherwise use filters
+        if(this.state.filtered) {
+            body = {
+                filtered: true,
+                seasonNumber: this.state.seasonNumber,
+                series: this.state.series
+            };
+        } else {
+            body = {
+                filtered: false,
+                searchTerm: this.state.searchTerm
+            };
+        }
+
+        this.setState({loadingTable:true}, this.postRequestWithBody("episodes", body, (result) => {
             console.log(result.episodes);
-            this.setState({episodes: result.episodes});
-        }, (err) => {
-            console.log(err);
-        });
+            this.setState({loadingTable: false, err: false, episodes: result.episodes});
+        }, (err) => this.errorHandler(err)));
     }
 
     handleSeasonSelection(e) {
@@ -121,65 +116,86 @@ class EpisodePlayer extends React.Component {
         this.setState({filtered: false}, this.populateTable);
     }
 
+    errorHandler(err) {
+        this.setState({err: true, errObject: err});
+    }
+
     render() {
-        return (
-            <div className  = "EpisodePlayerContainer">
-                <div className = "EpisodePlayerFilter">
-                    <div className = "LeftFilters">
-                        <div>
-                            <label htmlFor = "season" className = "FilterLabel">Season</label>
-                            <select id = "season" name = "season" className = "FilterSelector" onChange={(e) => {this.handleSeasonSelection(e)}}>
-                                {this.state.seasonsList.map((value, index, array) => {
-                                    if(index === 0) {
-                                        return <option value = {value} key={index}>{value}</option>;
-                                    } else {
-                                        return <option value = {value} key = {index}>Season {value}</option>;
-                                    }
-                                })} 
-                                
-                            </select>
+            if(!this.state.err) {
+                return (
+                    <div className  = "EpisodePlayerContainer">
+                        <div className = "EpisodePlayerFilter">
+                            <div className = "LeftFilters">
+                                <div>
+                                    <label htmlFor = "season" className = "FilterLabel">Season</label>
+                                    <select id = "season" name = "season" className = "FilterSelector" onChange={(e) => {this.handleSeasonSelection(e)}}>
+                                        {this.state.seasonsList.map((value, index, array) => {
+                                            if(index === 0) {
+                                                return <option value = {value} key={index}>{value}</option>;
+                                            } else {
+                                                return <option value = {value} key = {index}>Season {value}</option>;
+                                            }
+                                        })} 
+                                        
+                                    </select>
 
-                            <label htmlFor = "series" className = "FilterLabel">Series</label>
-                            <select id = "series" name = "series" className = "FilterSelector" onChange={(e) => {this.handleSeriesSelection(e)}}>
-                                {this.state.seriesList.map((value, index, array) => {
-                                    return <option value={value} key = {index}>{value}</option>
-                                })}
-                            </select>
+                                    <label htmlFor = "series" className = "FilterLabel">Series</label>
+                                    <select id = "series" name = "series" className = "FilterSelector" onChange={(e) => {this.handleSeriesSelection(e)}}>
+                                        {this.state.seriesList.map((value, index, array) => {
+                                            return <option value={value} key = {index}>{value}</option>
+                                        })}
+                                    </select>
 
-                            <button className = "FilterButton" id="applyFilter" onClick={(e) => {this.handleFilter(e)}}>Filter</button>
-                        </div>
-                    </div>
-
-                    <div className = "RightFilters">
-                        <div>
-                            <input id = "title" name = "title" id = "searchInput" placeholder = "Search episodes by title" onInput = {(e) => {this.handleSearchInput(e)}} />
-                            <button className = "FilterButton" id = "searchButton" onClick = {(e) => {this.handleSearch(e)}}>Search</button>
-                        </div>
-                    </div>
-                </div>
-                <table className = "EpisodePlayerTable">
-                    <thead>
-                        
-                    </thead>
-
-                    <tbody>
-                        {this.state.episodes.map((episode, index, array) => 
-                            <tr key = {index}>
-                            <td className = "ButtonInfoGroup">
-                                <a href = {episode.rssFeed}><i className="PlayButton fa fa-play-circle" aria-hidden="true"></i></a>
-                                <div className = "EpisodeInfo">
-                                    <h1 className = "EpisodeTitle">{episode.title}</h1>
-                                    <h3 className = "EpisodeReleaseDate">{episode.releaseDate}</h3>
+                                    <button className = "FilterButton" id="applyFilter" onClick={(e) => {this.handleFilter(e)}}>Filter</button>
                                 </div>
-                            </td>
+                            </div>
 
-                            <td>{episode.description}</td>
-                        </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        );
+                            <div className = "RightFilters">
+                                <div>
+                                    <input id = "title" name = "title" id = "searchInput" placeholder = "Search episodes by title" onInput = {(e) => {this.handleSearchInput(e)}} />
+                                    <button className = "FilterButton" id = "searchButton" onClick = {(e) => {this.handleSearch(e)}}>Search</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ScaleLoader loading={this.state.loadingTable} height={250} margin = {10} width = {10}/>
+
+
+                        <table className = "EpisodePlayerTable">
+                            <thead>
+                                
+                            </thead>
+
+                            <tbody>
+                                {this.state.episodes.map((episode, index, array) => 
+                                    <tr key = {index}>
+                                    <td className = "ButtonInfoGroup">
+                                        <a href = {episode.rssFeed}><i className="PlayButton fa fa-play-circle" aria-hidden="true"></i></a>
+                                        <div className = "EpisodeInfo">
+                                            <h1 className = "EpisodeTitle">{episode.title}</h1>
+                                            <h3 className = "EpisodeReleaseDate">{episode.releaseDate}</h3>
+                                        </div>
+                                    </td>
+
+                                    <td>{episode.description}</td>
+                                </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>);
+                } else {
+                    let typ = this.state.errObject.type;
+                    switch(typ) {
+                        case "CONN": 
+                            return <p>The server encountered connection errors. Please try again.</p>;
+                        case "PROC":
+                            return <p>The server encountered errors while processing data related to your request. Please try again.</p>
+                        case "IN":
+                            return <p>The server encountered errors because of invalid input. Please check your input and try agian.</p>
+                        default:
+                            return <p>An unknown server error occured. Please try again</p>
+                    }
+                }
     }
 }
 
