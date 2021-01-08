@@ -15,6 +15,7 @@ class EpisodePlayer extends React.Component {
     postRequestWithBody(endpoint, body, successCallback, errCallback) {
         fetch(`${backend}${endpoint}`, {
             method: "POST",
+            mode: "cors",
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -37,6 +38,7 @@ class EpisodePlayer extends React.Component {
     getRequestNoBody(endpoint, successCallback, errCallback) {
         fetch(`${backend}${endpoint}`, {
             method: "GET",
+            mode: "cors",
             headers: {
                 'Content-Type': 'application/json'
             }
