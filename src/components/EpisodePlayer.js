@@ -16,9 +16,6 @@ class EpisodePlayer extends React.Component {
         fetch(`${backend}${endpoint}`, {
             method: "POST",
             mode: "cors",
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify(body)
         }).then((response) => { //404 errors from the server still constitute a response
             response.json().then((result) => {
@@ -38,10 +35,7 @@ class EpisodePlayer extends React.Component {
     getRequestNoBody(endpoint, successCallback, errCallback) {
         fetch(`${backend}${endpoint}`, {
             method: "GET",
-            mode: "cors",
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            mode: "cors"
         }).then((response) => {
             response.json().then((result) => {
                 if(response.ok) {
