@@ -1,7 +1,8 @@
 import React from 'react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
+import { CSSTransitionGroup } from 'react-transition-group';
 
-const backend = "https://yawa-dey-backend.herokuapp.com/";
+const backend = "http://localhost:8080"; //"https://yawa-dey-backend.herokuapp.com";
 
 class EpisodePlayer extends React.Component {
     constructor(props) {
@@ -9,11 +10,12 @@ class EpisodePlayer extends React.Component {
         //the seasons and series arrays will always have "All" as their first value
         this.state = {seasonNumber: null, series: null, episodes: [], 
             seasonsList: ["All"], seriesList: ["All"], searchTerm:"", 
-            filtered: true, err:false, errObject: null, loadingTable:false};
+            filtered: true, err:false, errObject: null, loadingTable:false,
+            displayFilters: true};
     }
 
     postRequestWithBody(endpoint, body, successCallback, errCallback) {
-        fetch(`${backend}${endpoint}`, {
+        fetch(`${backend}/${endpoint}`, {
             method: "POST",
             mode: "cors",
             headers: {
@@ -36,7 +38,7 @@ class EpisodePlayer extends React.Component {
     }
 
     getRequestNoBody(endpoint, successCallback, errCallback) {
-        fetch(`${backend}${endpoint}`, {
+        fetch(`${backend}/${endpoint}`, {
             method: "GET",
             mode: "cors",
             headers: {
@@ -122,43 +124,64 @@ class EpisodePlayer extends React.Component {
         this.setState({err: true, errObject: err});
     }
 
+    toggleFilters(e) {
+       this.setState({displayFilters: !this.state.displayFilters});
+    }
+
     render() {
             if(!this.state.err) {
                 return (
                     <div className  = "EpisodePlayerContainer">
-                        <div className = "EpisodePlayerFilter">
-                            <div className = "LeftFilters">
-                                <div>
-                                    <label htmlFor = "season" className = "FilterLabel">Season</label>
-                                    <select id = "season" name = "season" className = "FilterSelector" onChange={(e) => {this.handleSeasonSelection(e)}}>
-                                        {this.state.seasonsList.map((value, index, array) => {
-                                            if(index === 0) {
-                                                return <option value = {value} key={index}>{value}</option>;
-                                            } else {
-                                                return <option value = {value} key = {index}>Season {value}</option>;
-                                            }
-                                        })} 
-                                        
-                                    </select>
-
-                                    <label htmlFor = "series" className = "FilterLabel">Series</label>
-                                    <select id = "series" name = "series" className = "FilterSelector" onChange={(e) => {this.handleSeriesSelection(e)}}>
-                                        {this.state.seriesList.map((value, index, array) => {
-                                            return <option value={value} key = {index}>{value}</option>
-                                        })}
-                                    </select>
-
-                                    <button className = "FilterButton" id="applyFilter" onClick={(e) => {this.handleFilter(e)}}>Filter</button>
-                                </div>
-                            </div>
-
-                            <div className = "RightFilters">
-                                <div>
-                                    <input id = "title" name = "title" id = "searchInput" placeholder = "Search episodes by title" onInput = {(e) => {this.handleSearchInput(e)}} />
-                                    <button className = "FilterButton" id = "searchButton" onClick = {(e) => {this.handleSearch(e)}}>Search</button>
-                                </div>
-                            </div>
+                        <div className="EpisodePlayerFilterSmall">
+                            {
+                                this.state.displayFilters ? 
+                                    <div onClick = {(e) => {this.toggleFilters(e)}}><i className="fa fa-times" aria-hidden="true"></i></div> :
+                                    <div onClick = {(e) => {this.toggleFilters(e)}}><i className="fa fa-plus" aria-hidden="true"></i></div>
+                            }
+                            
                         </div>
+                        {this.state.displayFilters ?
+                            <CSSTransitionGroup
+                                transitionName="filter"
+                                transitionEnterTimeout={500}
+                                transitionLeaveTimeout={300}>
+                                {
+                                    <div key = {1} className = "EpisodePlayerFilter">
+                                        <div className = "LeftFilters TopFilters">
+                                            <label htmlFor = "season" className = "FilterLabel">Season</label>
+                                            <select id = "season" name = "season" className = "FilterSelector" onChange={(e) => {this.handleSeasonSelection(e)}}>
+                                                {this.state.seasonsList.map((value, index, array) => {
+                                                    if(index === 0) {
+                                                        return <option value = {value} key={index}>{value}</option>;
+                                                    } else {
+                                                        return <option value = {value} key = {index}>Season {value}</option>;
+                                                    }
+                                                })} 
+                                                
+                                            </select>
+
+                                            <label htmlFor = "series" className = "FilterLabel">Series</label>
+                                            <select id = "series" name = "series" className = "FilterSelector" onChange={(e) => {this.handleSeriesSelection(e)}}>
+                                                {this.state.seriesList.map((value, index, array) => {
+                                                    return <option value={value} key = {index}>{value}</option>
+                                                })}
+                                            </select>
+
+                                            <div className="FilterButtonContainer"><button className = "FilterButton" id="applyFilter" onClick={(e) => {this.handleFilter(e)}}>Filter</button></div>
+                                        </div>
+
+                                        <div className = "RightFilters BottomFilters">
+                                            <div>
+                                                <input id = "title" name = "title" id = "searchInput" placeholder = "Search episodes by title" onInput = {(e) => {this.handleSearchInput(e)}} />
+                                                <button className = "FilterButton" id = "searchButton" onClick = {(e) => {this.handleSearch(e)}}>Search</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </CSSTransitionGroup>
+                        :
+                            <div></div>
+                        }
 
                         <ScaleLoader loading={this.state.loadingTable} height={250} margin = {10} width = {10}/>
 
@@ -171,16 +194,16 @@ class EpisodePlayer extends React.Component {
                             <tbody>
                                 {this.state.episodes.map((episode, index, array) => 
                                     <tr key = {index}>
-                                    <td className = "ButtonInfoGroup">
-                                        <a href = {episode.rssFeed}><i className="PlayButton fa fa-play-circle" aria-hidden="true"></i></a>
-                                        <div className = "EpisodeInfo">
-                                            <h1 className = "EpisodeTitle">{episode.title}</h1>
-                                            <h3 className = "EpisodeReleaseDate">{episode.releaseDate}</h3>
-                                        </div>
-                                    </td>
+                                        <td className = "ButtonInfoGroup">
+                                            <a href = {episode.rssFeed}><i className="PlayButton fa fa-play-circle" aria-hidden="true"></i></a>
+                                            <div className = "EpisodeInfo">
+                                                <h1 className = "EpisodeTitle">{episode.title}</h1>
+                                                <h3 className = "EpisodeReleaseDate">{episode.releaseDate}</h3>
+                                            </div>
+                                        </td>
 
-                                    <td>{episode.description}</td>
-                                </tr>
+                                        <td className="EpisodeDescription">{episode.description}</td>
+                                    </tr>
                                 )}
                             </tbody>
                         </table>
