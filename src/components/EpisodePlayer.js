@@ -2,7 +2,7 @@ import React from 'react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { CSSTransitionGroup } from 'react-transition-group';
 
-const backend = "http://localhost:8080"; //"https://yawa-dey-backend.herokuapp.com";
+const backend = "https://yawa-dey-backend.herokuapp.com"; //"http://localhost:8080"; 
 
 class EpisodePlayer extends React.Component {
     constructor(props) {
