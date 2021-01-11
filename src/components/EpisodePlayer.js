@@ -141,44 +141,38 @@ class EpisodePlayer extends React.Component {
                             
                         </div>
                         {this.state.displayFilters ?
-                            <CSSTransitionGroup
-                                transitionName="filter"
-                                transitionEnterTimeout={500}
-                                transitionLeaveTimeout={300}>
-                                {
-                                    <div key = {1} className = "EpisodePlayerFilter">
-                                        <div className = "LeftFilters TopFilters">
-                                            <label htmlFor = "season" className = "FilterLabel">Season</label>
-                                            <select id = "season" name = "season" className = "FilterSelector" onChange={(e) => {this.handleSeasonSelection(e)}}>
-                                                {this.state.seasonsList.map((value, index, array) => {
-                                                    if(index === 0) {
-                                                        return <option value = {value} key={index}>{value}</option>;
-                                                    } else {
-                                                        return <option value = {value} key = {index}>Season {value}</option>;
-                                                    }
-                                                })} 
-                                                
-                                            </select>
 
-                                            <label htmlFor = "series" className = "FilterLabel">Series</label>
-                                            <select id = "series" name = "series" className = "FilterSelector" onChange={(e) => {this.handleSeriesSelection(e)}}>
-                                                {this.state.seriesList.map((value, index, array) => {
-                                                    return <option value={value} key = {index}>{value}</option>
-                                                })}
-                                            </select>
+                            <div key = {1} className = "EpisodePlayerFilter">
+                                <div className = "LeftFilters TopFilters">
+                                    <label htmlFor = "season" className = "FilterLabel">Season</label>
+                                    <select id = "season" name = "season" className = "FilterSelector" onChange={(e) => {this.handleSeasonSelection(e)}}>
+                                        {this.state.seasonsList.map((value, index, array) => {
+                                            if(index === 0) {
+                                                return <option value = {value} key={index}>{value}</option>;
+                                            } else {
+                                                return <option value = {value} key = {index}>Season {value}</option>;
+                                            }
+                                        })} 
+                                        
+                                    </select>
 
-                                            <div className="FilterButtonContainer"><button className = "FilterButton" id="applyFilter" onClick={(e) => {this.handleFilter(e)}}>Filter</button></div>
-                                        </div>
+                                    <label htmlFor = "series" className = "FilterLabel">Series</label>
+                                    <select id = "series" name = "series" className = "FilterSelector" onChange={(e) => {this.handleSeriesSelection(e)}}>
+                                        {this.state.seriesList.map((value, index, array) => {
+                                            return <option value={value} key = {index}>{value}</option>
+                                        })}
+                                    </select>
 
-                                        <div className = "RightFilters BottomFilters">
-                                            <div>
-                                                <input id = "title" name = "title" id = "searchInput" placeholder = "Search episodes by title" onInput = {(e) => {this.handleSearchInput(e)}} />
-                                                <button className = "FilterButton" id = "searchButton" onClick = {(e) => {this.handleSearch(e)}}>Search</button>
-                                            </div>
-                                        </div>
+                                    <div className="FilterButtonContainer"><button className = "FilterButton" id="applyFilter" onClick={(e) => {this.handleFilter(e)}}>Filter</button></div>
+                                </div>
+
+                                <div className = "RightFilters BottomFilters">
+                                    <div>
+                                        <input id = "title" name = "title" id = "searchInput" placeholder = "Search episodes by title" onInput = {(e) => {this.handleSearchInput(e)}} />
+                                        <button className = "FilterButton" id = "searchButton" onClick = {(e) => {this.handleSearch(e)}}>Search</button>
                                     </div>
-                                }
-                            </CSSTransitionGroup>
+                                </div>
+                            </div>
                         :
                             <div></div>
                         }
